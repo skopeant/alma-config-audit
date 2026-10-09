@@ -1,0 +1,68 @@
+[alma]
+api_base = https://api-eu.hosted.exlibrisgroup.com/almaws/v1
+api_key = CHANGE_ME
+
+[primo]
+# Primo VE audit is optional. The same API key is used; it must also have
+# Primo Configuration / Production / Read-only permission.
+enabled = false
+api_base = https://api-eu.hosted.exlibrisgroup.com/primo/v1
+# Comma-separated Primo VE view IDs (VID). Example:
+# views = 01ABC_INST:MAIN,01ABC_INST:TEST
+views =
+
+[analytics]
+# Optional supplement for configuration not available through the public
+# Alma Configuration REST API, especially Terms of Use / Policies and
+# Fulfillment Rules.
+#
+# The analyses must be created in Alma Analytics and shared with the API user.
+# See README.md for required columns.
+enabled = false
+tou_policies_path = /shared/Your Institution/API/API_conf_TOU_Policies
+rules_path = /shared/Your Institution/API/API_conf_Rule
+
+# Optional: enrich local Code/Mapping changes with Event Creator / event time
+# from an Alma Analytics System Events analysis. Leave empty to disable.
+# No extra API call is made when this value is empty.
+configuration_events_path =
+
+# Conservative matching window between the Analytics event time and the
+# local REST audit detection time. Exact TABLE_NAME must also match.
+configuration_events_match_minutes = 360
+
+# Event Date and Time from Analytics has no timezone information.
+# Set the institution-local timezone used by that report.
+configuration_events_timezone = Europe/Prague
+
+limit = 1000
+
+[audit]
+database = /var/lib/alma-config-audit/audit.sqlite3
+include_code_tables = true
+include_mapping_tables = true
+include_extended_configuration = true
+
+# Optional multilingual Code Table audit. Leave empty to keep the historical
+# behavior (institution default language only). For a Czech/English institution:
+# code_table_languages = cs,en
+code_table_languages =
+
+# Shared process lock used by both alma-config-audit.py and
+# alma-config-audit-analytics.py. It protects the common SQLite database even
+# when the scripts are started manually at the same time.
+lock_file = /var/lib/alma-config-audit/audit.lock
+lock_wait_seconds = 300
+
+# Table names not returned by the list endpoints can be added here.
+extra_code_tables =
+extra_mapping_tables =
+
+# Optional discovery candidate file.
+discovery_candidates_file = /etc/alma-config-audit-discover.txt
+
+# Sensitive values are masked before they are stored in SQLite.
+redact_patterns = password,passwd,secret,token,apikey,api_key,consumer_key,licence_key,license_key,jwt_signature
+
+timeout = 60
+request_delay = 0.10

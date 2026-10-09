@@ -1,0 +1,6 @@
+<?php
+
+define('AUDIT_DB_PATH', '/var/lib/alma-config-audit/audit.sqlite3');
+define('AUDIT_TIMEZONE', 'Europe/Prague');
+define('AUDIT_SITE_TITLE', 'Alma – audit konfigurace');
+define('AUDIT_INSTITUTION', 'Název instituce');

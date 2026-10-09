@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alma / Primo VE / Analytics – audit konfigurace</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;max-width:1050px;margin:auto;padding:30px 20px;line-height:1.55;color:#222;background:#f6f7f8}
+header,section{background:#fff;border:1px solid #ddd;border-radius:10px;padding:22px;margin-bottom:18px}
+h1,h2{margin-top:0}code,pre{background:#f0f2f4;border-radius:5px}code{padding:2px 5px}pre{padding:14px;overflow:auto}
+.meta{color:#666}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.note{border-left:5px solid #0065bd;background:#eef6fc;padding:12px 15px}.stat{font-size:1.15em;font-weight:bold;color:#0065bd}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.shot{margin:0}.shot img{width:100%;height:auto;border:1px solid #ccd3da;border-radius:6px;display:block}.shot figcaption{font-size:.92em;color:#555;margin-top:6px}
+@media(max-width:750px){.grid,.gallery{grid-template-columns:1fr}}
+
+    .hero-diagram{margin:18px 0 6px}
+    .hero-diagram img{width:100%;height:auto;border:1px solid #ccd3da;border-radius:10px;display:block}
+    .hero-diagram figcaption{font-size:14px;color:#555;margin-top:8px}
+
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-top: 28px;
+      padding: 16px 4px 4px;
+      border-top: 1px solid #d7d7d7;
+      color: #666;
+      font-size: 14px;
+    }
+    .site-footer a {
+      color: #1f5f99;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      .site-footer {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+</style>
+</head>
+<body>
+<header>
+<h1>Alma / Primo VE / Analytics – audit konfigurace</h1>
+<p>Snapshot/diff audit konfigurace Alma a Primo VE rozšířený o Alma Analytics pro Terms of Use, TOU Policies a Fulfillment Rules.</p>
+<p class="meta">Verze 1.2.0 · 09.10.2026 · jedna SQLite databáze · jeden web · samostatný REST audit a Analytics audit.</p>
+</header>
+
+<section>
+<h2>Datové zdroje</h2>
+<div class="grid">
+<div><h3>REST API</h3><ul>
+<li>Code/Mapping Tables</li><li>Libraries, Locations, Circ Desks</li><li>Departments</li>
+<li>Integration/Import Profiles</li><li>Printers, Letters, Normalization Rules</li>
+<li>Deposit Profiles a Scheduled Jobs</li><li>Primo VE Views</li>
+</ul></div>
+<div><h3>Alma Analytics</h3><ul>
+<li>Terms of Use</li><li>TOU Policies</li><li>Fulfillment Rules</li>
+<li>Modification Date / Modified By</li><li>volitelný historický import</li>
+</ul></div>
+</div>
+</section>
+
+<section>
+<h2>Vícejazyčné Code Tables</h2>
+<p>Code Tables mohou mít samostatné překlady podle jazyka. Volitelné nastavení <code>code_table_languages = cs,en</code> načte každou Code Table zvlášť pro češtinu a angličtinu. Ve webu se pak zobrazují například jako <code>UserGroups [cs]</code> a <code>UserGroups [en]</code>.</p>
+<p>Pokud nastavení zůstane prázdné, audit načítá pouze výchozí jazyk instituce stejně jako dříve. První přechod na vícejazyčný režim tiše odstraní staré jednojazyčné baseline, aby samotná změna klíčování nevytvořila falešnou historii.</p>
+</section>
+
+<section>
+<h2>Proč Analytics</h2>
+<p>Některé části Fulfillment konfigurace nejsou veřejným Alma Configuration REST API přímo dostupné. Doplňkový skript proto čte dvě vlastní Analytics analýzy a ukládá je do stejné databáze jako REST/Primo audit.</p>
+<pre>tou
+tou_policy
+fulfillment_rule</pre>
+<p>U skutečných následných změn vzniká standardní Before → After. Pokud Analytics poskytují metadata změny, web používá skutečný čas a uživatele změny.</p>
+<div class="note"><strong>Důležité – Repeat Values:</strong> Ve všech třech Analytics analýzách (<code>API_conf_TOU_Policies</code>, <code>API_conf_Rule</code> a volitelná Configuration Events analýza (na ČVUT <code>API_conf_USER</code>)) nastavte u <strong>všech sloupců opakování hodnot / Repeat Values</strong>. Skript očekává každý řádek jako úplný samostatný záznam; prázdné opakované hodnoty se z předchozího řádku nedoplňují.</div>
+
+</section>
+
+<section>
+<h2>Doplnění uživatele a času z Configuration Events</h2>
+<p>Volitelná Analytics analýza nad System Events / Configuration může doplnit přesný čas a uživatele k lokálním změnám Code/Mapping Tables a od verze 1.2.0 také ke změněným Mapping Tables uvnitř Primo VE View. Na ČVUT je report uložen jako <code>API_conf_USER</code>. Funkce se spustí pouze tehdy, když je v konfiguraci vyplněn <code>configuration_events_path</code>.</p>
+<p>U všech sloupců musí být zapnuto <strong>Repeat Values</strong>. Doporučený SQL filtr posledních 10 dní:</p>
+<pre>"Event Date"."Event Date and Time" &gt;= TIMESTAMPADD(SQL_TSI_DAY, -10, CURRENT_DATE)</pre>
+<p>Doporučené řazení: <strong>Event Date and Time DESC</strong>, potom <strong>Event Id DESC</strong> přes „Přidat sestupné řazení“ a nakonec <strong>Event Key Name ASC</strong> přes „Přidat vzestupné řazení“. Pořadí sloupců není pro skript důležité.</p>
+<p><code>Event Date and Time</code> nemá v Analytics informaci o časovém pásmu. Nastavení <code>configuration_events_timezone</code> určuje lokální pásmo; výchozí hodnota je <code>Europe/Prague</code>.</p>
+<div class="note">Primo enrichment je konzervativní: všechny změněné Mapping Tables musí mít odpovídající Configuration Event. Více autorů se zachová v souhrnu a přesná vazba Mapping Table → event → autor → čas se ukládá do <code>analytics_details_json</code>.</div>
+</section>
+
+<section>
+<h2>Historie z Analytics</h2>
+<p>Volba <code>--import-history</code> je ruční režim pro první nasazení nebo obnovu po výpadku. Z aktuálních Analytics dat vloží poslední známou změnu podle <code>Modification Date / Modified By</code>.</p>
+<p>Pokud je v lokální databázi starší snapshot s jinou hodnotou, lze jej použít jako skutečné Before. Pokud starší stav chybí, web historickou událost jasně označí a neprezentuje neznámou hodnotu jako skutečné Before.</p>
+</section>
+
+<section>
+<h2>Společná databáze a souběh</h2>
+<pre>alma-config-audit.py
+             ↘
+              SQLite audit.sqlite3 → PHP web
+             ↗
+alma-config-audit-analytics.py</pre>
+<p>Oba procesy používají společný lock, SQLite WAL a <code>busy_timeout</code>. Současné spuštění se serializuje i při ručním startu.</p>
+</section>
+
+<section>
+<h2>Referenční provoz</h2>
+<p class="stat">Hlavní běh bez dalších jazyků: cca 643 Alma REST + 3 Primo API = 646 volání. Při <code>code_table_languages = cs,en</code> přibude přibližně jedno další GET volání na každou Code Table (v referenční instalaci zhruba +196 volání).</p>
+<p>Aktuální referenční Analytics snapshot: 35 TOU objektů, 337 TOU/Policy záznamů a 79 Fulfillment Rules. Reporty jsou pod 1000 řádků, takže celý Analytics běh používá 2 API volání.</p>
+<p>Hlavní audit běží častěji; Analytics je vhodné pouštět například jednou denně po ETL.</p>
+</section>
+
+<section>
+<h2>Výjimky</h2>
+<p><code>Library Open Hours</code> se záměrně neauditují kvůli automaticky posouvanému kalendáři. <code>ILL_EMAIL_TO_USER</code> při nedostupném detail endpointu používá summary a nejde o chybu běhu.</p>
+</section>
+
+<section>
+<h2>Webové rozhraní</h2>
+<p>Jednotný PHP web zobrazuje běžné REST/Primo změny i Analytics historii. U vnořených JSONů provede rekurzivní diff a zobrazí konkrétní změněné cesty. U obohacených Primo změn zobrazuje Analytics autora a časy u příslušné Mapping Table. Lokální název instituce, titul, timezone a cesta k DB jsou pouze v <code>web/config.php</code>; <code>index.php</code> a <code>detail.php</code> jsou stejné pro všechny instalace.</p>
+</section>
+
+<section>
+<h2>Ukázky z provozu</h2>
+<div class="gallery">
+<figure class="shot"><a href="screenshots/audit-overview.png"><img src="screenshots/audit-overview.png" alt="Přehled nalezených změn"></a><figcaption>Přehled změn s filtrováním.</figcaption></figure>
+<figure class="shot"><a href="screenshots/detail-library-department.png"><img src="screenshots/detail-library-department.png" alt="Detail změny"></a><figcaption>Konkrétní Before / After.</figcaption></figure>
+<figure class="shot"><a href="screenshots/detail-code-added.png"><img src="screenshots/detail-code-added.png" alt="Přidání řádku"></a><figcaption>Přidání řádku v Code Table.</figcaption></figure>
+<figure class="shot"><a href="screenshots/audit-run-summary.png"><img src="screenshots/audit-run-summary.png" alt="Konzolový souhrn"></a><figcaption>Konzolový souhrn auditu.</figcaption></figure>
+</div>
+</section>
+
+<section>
+<h2>Licence a omezení</h2>
+<div class="note">Nejde o úplný backup/restore. Mezikroky mezi snapshoty se nemusí zachytit a Analytics mohou mít ETL zpoždění.</div>
+<p>MIT · Copyright © 2026 Ústřední knihovna ČVUT a Antonín Skopec.</p>
+<p>Nezávislý nástroj; nejde o produkt ani oficiálně podporovaný nástroj Ex Libris.</p>
+</section>
+
+<footer class="site-footer">
+  <span>ASk © 2026 · <a href="https://github.com/skopeant/alma-config-audit">GitHub</a></span>
+  <a href="/alma/">← Návrat na hlavní stránku</a>
+</footer>
+</body></html>

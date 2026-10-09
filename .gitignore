@@ -1,0 +1,20 @@
+# Local secrets and runtime data
+alma-config-audit.conf
+*.sqlite
+*.sqlite3
+*.db
+*.log
+.htpasswd
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local web configuration
+web/config.php
