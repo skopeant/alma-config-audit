@@ -1,7 +1,7 @@
 # Alma / Primo VE / Analytics Configuration Audit
 
-**Aktuální verze:** 1.2.0  
-**Datum vydání:** 2026-10-09
+**Aktuální verze:** 1.2.1  
+**Datum vydání:** 2026-10-19
 
 Přenositelný balíček pro průběžný audit změn konfigurace Ex Libris Alma, volitelně Primo VE a doplňkově Alma Analytics pro části Fulfillment konfigurace, které veřejné Configuration REST API neposkytuje.
 
@@ -311,6 +311,7 @@ Pokud zapnete vícejazyčné Code Tables pomocí například `code_table_languag
 
 ## Historie verzí
 
+- **1.2.1 (2026-10-19)** – oprava falešných Primo VE `OBJECT_UPDATED` způsobených nestabilním pořadím řádků v Mapping Table `Rapido Self Registration Optional Parameters`; skutečné změny hodnot zůstávají zachyceny.
 - **1.2.0 (2026-10-09)** – enrichment Primo VE změn z Analytics Configuration Events na úrovni konkrétních Mapping Tables, podpora více autorů, `analytics_details_json`, správná interpretace lokálního času přes `configuration_events_timezone`, rozšířené typy Mapping Table eventů, 10denní doporučené okno reportu a zobrazení Primo Analytics detailů ve webu.
 - **1.1.0 (2026-10-03)** – volitelný enrichment Code/Mapping změn z Analytics Configuration Events (`API_conf_USER` na ČVUT), dokumentované Repeat Values/filtry/řazení Analytics, vícejazyčný audit Code Tables přes `code_table_languages` (např. `cs,en`), přívětivé názvy Code Tables z API a rychlé testovací režimy `--codetables` a `--extended`.
 - **0.1.0** – základní audit Code/Mapping Tables, SQLite, Before/After a PHP web.

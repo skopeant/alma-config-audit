@@ -990,6 +990,29 @@ def normalize_payload(
                         ),
                     )
 
+
+                # Primo Configuration API vrací tabulku
+                # "Rapido Self Registration Optional Parameters"
+                # v nestabilním pořadí. Obsah řádků je přitom stejný,
+                # ale jiné pořadí mění hash celého Primo View a vytváří
+                # falešné OBJECT_UPDATED. Pro tuto konkrétní tabulku
+                # proto pořadí stabilizujeme podle celého obsahu řádku.
+                # Skutečná změna kterékoliv hodnoty zůstává zachycena.
+                rapido_self_registration = mapping_tables.get(
+                    "Rapido Self Registration Optional Parameters",
+                )
+
+                if isinstance(
+                    rapido_self_registration,
+                    list,
+                ):
+                    mapping_tables[
+                        "Rapido Self Registration Optional Parameters"
+                    ] = sorted(
+                        rapido_self_registration,
+                        key=canonical_json,
+                    )
+
     if object_type == "integration_profile":
         # Alma může vracet parametry integračního profilu v jiném pořadí.
         # Pořadí samo o sobě není změna konfigurace, proto seznam

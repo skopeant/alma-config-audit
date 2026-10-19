@@ -1278,7 +1278,7 @@ $analyticsDetails = analyticsDetails($row);
 <div class="wrap">
     <div class="header">
         <div class="header-title"><?=h(AUDIT_SITE_TITLE)?></div>
-        <div class="header-subtitle"><?=h(AUDIT_INSTITUTION)?> · verze 1.2.0</div>
+        <div class="header-subtitle"><?=h(AUDIT_INSTITUTION)?> · verze 1.2.1</div>
     </div>
     <div class="content">
 

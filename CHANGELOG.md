@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 - 2026-10-19
+- Stabilized the Primo VE `Rapido Self Registration Optional Parameters` Mapping Table, whose rows may be returned by the Configuration API in a non-deterministic order.
+- Prevented order-only changes in that table from creating false `OBJECT_UPDATED` events while preserving detection of real value changes.
+- Existing Primo baseline is migration-safe: the first run after the update can normalize the stored snapshot without creating a false change.
+
 ## 1.2.0 - 2026-10-09
 - Added Primo VE Configuration Events enrichment at the changed Mapping Table level.
 - Added support for multiple authors (`NOVAK / SKOPEC`).

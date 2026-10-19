@@ -1,7 +1,7 @@
 # Alma / Primo VE / Analytics Configuration Audit
 
-**Current version:** 1.2.0  
-**Release date:** 2026-10-09
+**Current version:** 1.2.1  
+**Release date:** 2026-10-19
 
 A portable configuration change audit for Ex Libris Alma, optionally Primo VE, with an Alma Analytics supplement for Fulfillment configuration that is not exposed by the public Configuration REST API.
 
@@ -326,6 +326,7 @@ python3 /opt/alma-config-audit/alma-config-audit.py --jobs
 
 ## Version history
 
+- **1.2.1 (2026-10-19)** – fixed false Primo VE `OBJECT_UPDATED` events caused by non-deterministic row ordering in the `Rapido Self Registration Optional Parameters` Mapping Table; real value changes remain detectable.
 - **1.2.0 (2026-10-09)** – Primo VE Configuration Events enrichment at changed Mapping Table level, multiple authors, `analytics_details_json`, correct local-time interpretation via `configuration_events_timezone`, expanded Mapping Table event types, recommended 10-day report window, and Primo Analytics details in the web UI.
 - **1.1.0 (2026-10-03)** – optional Code/Mapping Configuration Events enrichment, documented Analytics Repeat Values/filters/sorting, multilingual Code Tables via `code_table_languages`, friendly Code Table labels, and focused `--codetables` / `--extended` modes.
 - **1.0.0** – Scheduled Jobs stabilization, `--jobs`, operational-noise filtering, and clearer Integration Profile display.

@@ -48,8 +48,13 @@ h1,h2{margin-top:0}code,pre{background:#f0f2f4;border-radius:5px}code{padding:2p
 <header>
 <h1>Alma / Primo VE / Analytics – audit konfigurace</h1>
 <p>Snapshot/diff audit konfigurace Alma a Primo VE rozšířený o Alma Analytics pro Terms of Use, TOU Policies a Fulfillment Rules.</p>
-<p class="meta">Verze 1.2.0 · 09.10.2026 · jedna SQLite databáze · jeden web · samostatný REST audit a Analytics audit.</p>
+<p class="meta">Verze 1.2.1 · 19.10.2026 · jedna SQLite databáze · jeden web · samostatný REST audit a Analytics audit.</p>
 </header>
+
+<section>
+<h2>Novinky ve verzi 1.2.1</h2>
+<p>Opraveny falešné změny Primo VE způsobené nestabilním pořadím řádků v Mapping Table <code>Rapido Self Registration Optional Parameters</code>. Audit nyní tuto konkrétní tabulku před výpočtem hashe stabilně řadí; skutečné změny hodnot zůstávají zachyceny.</p>
+</section>
 
 <section>
 <h2>Datové zdroje</h2>

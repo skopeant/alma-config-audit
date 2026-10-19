@@ -336,7 +336,7 @@ a{
 <div class="page">
 <div class="header">
     <h1><?=h(AUDIT_SITE_TITLE)?></h1>
-    <div class="subtitle"><?=h(AUDIT_INSTITUTION)?> · verze 1.2.0</div>
+    <div class="subtitle"><?=h(AUDIT_INSTITUTION)?> · verze 1.2.1</div>
 </div>
 <div class="content">
 <div class="card"><form method="get">
